@@ -21,10 +21,14 @@ class _TelPreTempoState extends State<TelPreTempo> {
   final txtCep = TextEditingController();
   String uf ='';
   String cidade= '';
+  String bairro = '';
   String data ='';
   String horario ='';
   String temperatura ='';
   String descricaoTemp = '';
+  String proxDia ='';
+  String proxData ='';
+  String proxDescricaoTemp = '';
 
   @override
   Widget build(BuildContext context) {
@@ -36,6 +40,7 @@ class _TelPreTempoState extends State<TelPreTempo> {
       Map endereco = json.decode(respostaCep.body);
       print(respostaCep.body);
       cidade = '${endereco['localidade']}';
+      bairro ='${endereco['bairro']}';
       uf = '${endereco['uf']}';
 
       final String urlApiTempo = 'https://api.hgbrasil.com/weather?format=json-cors&key=49fd9961&city_name=$cidade,$uf';
@@ -46,8 +51,12 @@ class _TelPreTempoState extends State<TelPreTempo> {
 
       data ='${infoPrev['results']['date']}';
       horario ='${infoPrev['results']['time']}';
-      temperatura ='${infoPrev['results']['temp']}';
+      temperatura ='${infoPrev['results']['temp']} º';
       descricaoTemp = '${infoPrev['results']['description']}';
+
+      proxDia = '${infoPrev['results']['forecast'][1]['weekday']}';
+      proxData = '${infoPrev['results']['forecast'][1]['date']}';
+      proxDescricaoTemp = '${infoPrev['results']['forecast'][1]['description']}';
 
       setState(() {
         
@@ -87,7 +96,35 @@ class _TelPreTempoState extends State<TelPreTempo> {
     }
 
     criaColumnContainer(){
-      
+      return Column(
+        children: [
+          Container(        
+            margin: const EdgeInsets.all(10.0),
+            color: Colors.white,
+            width: 1000,
+            height: 20,
+            alignment: Alignment.center,
+            child: Title(color: Colors.black, child: Texto(
+              conteudo: '$proxDia - $proxData',
+              tamanho: 20,
+            ),
+            
+            )
+  ),
+          Container(            
+            color: Colors.white,            
+            width: 1000,
+            height: 100,            
+            alignment: Alignment.center,
+            child: Title(color: Colors.black, child: Texto(
+              conteudo: '$proxDescricaoTemp',
+              tamanho: 70,
+            ),
+            
+            )
+  ),
+        ]
+      );
     }
 
     criaBody(){
@@ -101,18 +138,21 @@ class _TelPreTempoState extends State<TelPreTempo> {
               conteudo: 'Cidade: $cidade ${uf.toUpperCase()}',
             ),
             Texto(
+              conteudo: 'Bairro: $bairro',
+            ),
+            Texto(
               conteudo: 'Data: $data',
             ),
             Texto(
               conteudo: 'Hora: $horario',
             ),
             Texto(
-              conteudo: 'Temperatura: $temperatura',
+              conteudo: 'Temperatura: $temperatura ',
             ),
             Texto(
               conteudo: 'Descrição: $descricaoTemp',
             ),
-            
+            criaColumnContainer(),
             
           ],
         )),
